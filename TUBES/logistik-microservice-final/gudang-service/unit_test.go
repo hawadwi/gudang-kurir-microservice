@@ -5,6 +5,7 @@ import (
 )
 
 func TestStartSortingSuccess(t *testing.T) {
+	repo := &PackageRepository{db: nil}
 	service := NewSortingService(repo)
 
 	pkg := &Package{
@@ -27,6 +28,7 @@ func TestStartSortingSuccess(t *testing.T) {
 }
 
 func TestStartSortingNil(t *testing.T) {
+	repo := &PackageRepository{db: nil}
 	service := NewSortingService(repo)
 
 	err := service.StartSorting(nil)
@@ -36,6 +38,7 @@ func TestStartSortingNil(t *testing.T) {
 }
 
 func TestStartSortingEmptyResi(t *testing.T) {
+	repo := &PackageRepository{db: nil}
 	service := NewSortingService(repo)
 
 	pkg := &Package{
@@ -52,6 +55,7 @@ func TestStartSortingEmptyResi(t *testing.T) {
 }
 
 func TestStartSortingEmptyWarehouseZone(t *testing.T) {
+	repo := &PackageRepository{db: nil}
 	service := NewSortingService(repo)
 
 	pkg := &Package{
@@ -68,6 +72,7 @@ func TestStartSortingEmptyWarehouseZone(t *testing.T) {
 }
 
 func TestStartSortingInvalidStatus(t *testing.T) {
+	repo := &PackageRepository{db: nil}
 	service := NewSortingService(repo)
 
 	pkg := &Package{
@@ -84,6 +89,7 @@ func TestStartSortingInvalidStatus(t *testing.T) {
 }
 
 func TestCompleteSortingSuccess(t *testing.T) {
+	repo := &PackageRepository{db: nil}
 	service := NewSortingService(repo)
 
 	pkg := &Package{
@@ -107,6 +113,7 @@ func TestCompleteSortingSuccess(t *testing.T) {
 }
 
 func TestCompleteSortingNil(t *testing.T) {
+	repo := &PackageRepository{db: nil}
 	service := NewSortingService(repo)
 
 	err := service.CompleteSorting(nil)
@@ -116,6 +123,7 @@ func TestCompleteSortingNil(t *testing.T) {
 }
 
 func TestCompleteSortingNotSorting(t *testing.T) {
+	repo := &PackageRepository{db: nil}
 	service := NewSortingService(repo)
 
 	pkg := &Package{
@@ -131,6 +139,7 @@ func TestCompleteSortingNotSorting(t *testing.T) {
 }
 
 func TestGetPendingPackagesSuccess(t *testing.T) {
+	repo := &PackageRepository{db: nil}
 	service := NewSortingService(repo)
 
 	packages := []Package{
@@ -146,6 +155,7 @@ func TestGetPendingPackagesSuccess(t *testing.T) {
 }
 
 func TestGetPendingPackagesEmpty(t *testing.T) {
+	repo := &PackageRepository{db: nil}
 	service := NewSortingService(repo)
 
 	packages := []Package{
@@ -160,6 +170,7 @@ func TestGetPendingPackagesEmpty(t *testing.T) {
 }
 
 func TestValidatePackageSuccess(t *testing.T) {
+	repo := &PackageRepository{db: nil}
 	service := NewSortingService(repo)
 
 	pkg := &Package{
@@ -176,7 +187,8 @@ func TestValidatePackageSuccess(t *testing.T) {
 }
 
 func TestValidatePackageNil(t *testing.T) {
-	service := NewSortingService()
+	repo := &PackageRepository{db: nil}
+	service := NewSortingService(repo)
 
 	err := service.ValidatePackage(nil)
 	if err == nil {
@@ -185,6 +197,7 @@ func TestValidatePackageNil(t *testing.T) {
 }
 
 func TestValidatePackageEmptyResi(t *testing.T) {
+	repo := &PackageRepository{db: nil}
 	service := NewSortingService(repo)
 
 	pkg := &Package{
@@ -201,6 +214,7 @@ func TestValidatePackageEmptyResi(t *testing.T) {
 }
 
 func TestValidatePackageInvalidUserID(t *testing.T) {
+	repo := &PackageRepository{db: nil}
 	service := NewSortingService(repo)
 
 	pkg := &Package{
@@ -217,6 +231,7 @@ func TestValidatePackageInvalidUserID(t *testing.T) {
 }
 
 func TestValidatePackageInvalidWeight(t *testing.T) {
+	srepo := &PackageRepository{db: nil}
 	service := NewSortingService(repo)
 
 	pkg := &Package{
@@ -233,6 +248,7 @@ func TestValidatePackageInvalidWeight(t *testing.T) {
 }
 
 func TestValidatePackageEmptyWarehouseZone(t *testing.T) {
+	repo := &PackageRepository{db: nil}
 	service := NewSortingService(repo)
 
 	pkg := &Package{
@@ -249,6 +265,7 @@ func TestValidatePackageEmptyWarehouseZone(t *testing.T) {
 }
 
 func BenchmarkStartSorting(b *testing.B) {
+	repo := &PackageRepository{db: nil}
 	service := NewSortingService(repo)
 	pkg := &Package{
 		UserID:        123,
@@ -264,6 +281,7 @@ func BenchmarkStartSorting(b *testing.B) {
 }
 
 func BenchmarkValidatePackage(b *testing.B) {
+	repo := &PackageRepository{db: nil}
 	service := NewSortingService(repo)
 	pkg := &Package{
 		Resi:          "RES001",
