@@ -80,3 +80,8 @@ func (h *SortingHandler) CompleteSort(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(pkg)
 }
 
+func (h *SortingHandler) Health(w http.ResponseWriter, r *http.Request) {
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte("OK"))
+}
+
