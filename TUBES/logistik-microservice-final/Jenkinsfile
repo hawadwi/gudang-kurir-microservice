@@ -1,277 +1,45 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKER_REGISTRY = "docker.io/dhiyauu"
-        IMAGE_TAG = "${env.BUILD_ID}"
-        KUBECONFIG = "/var/jenkins_home/.kube/config"
-    }
-
     stages {
-        stage('1. Checkout Repo') {
+
+        stage('Test Gudang') {
             steps {
-                echo 'Checking out source code...'
-                checkout scm
+                dir('TUBES/logistik-microservice-final/gudang-service') {
+                    sh 'go test ./...'
+                }
             }
         }
 
-        stage('2. Unit Tests') {
+        stage('Test Courier') {
             steps {
-                echo 'Running User Service Unit Tests...'
-                dir('user-service') {
-                    sh 'go test -v ./... -skip Functional'
-                }
-        
-                echo 'Running Order Service Unit Tests...'
-                dir('order-service') {
-                    sh 'go test -v ./... -skip Functional'
-                }
-        
-                echo 'Running Tracking Service Unit Tests...'
-                dir('tracking-service') {
-                    sh 'go test -v ./... -skip Functional'
-                }
-
-                echo 'Running Gudang Service Unit Tests...'
-                dir('gudang-service') {
-                    sh 'go test -v ./... -skip Functional'
-                }
-
-                echo 'Running Courier Service Unit Tests...'
-                dir('courier-service') {
-                    sh 'go test -v ./... -skip Functional'
-                }
-
-                echo 'Running Report Service Unit Tests...'
-                dir('report-service') {
-                    sh 'go test -v ./... -skip Functional'
+                dir('TUBES/logistik-microservice-final/courier-service') {
+                    sh 'go test ./...'
                 }
             }
         }
 
-        stage('3. Lint / Vet') {
+        stage('Build Images') {
             steps {
-                dir('user-service') {
-                    sh 'go vet ./...'
-                }
-
-                dir('order-service') {
-                    sh 'go vet ./...'
-                }
-
-                dir('tracking-service') {
-                    sh 'go vet ./...'
-                }
-
-                dir('gudang-service') {
-                    sh 'go vet ./...'
-                }
-
-                dir('courier-service') {
-                    sh 'go vet ./...'
-                }
-
-                dir('report-service') {
-                    sh 'go vet ./...'
+                dir('TUBES/logistik-microservice-final') {
+                    sh 'docker compose build'
                 }
             }
         }
 
-        stage('4. Build Images') {
+        stage('Run Containers') {
             steps {
-                echo 'Building User Service Image...'
-                sh 'docker build -t user-service:latest ./user-service'
-
-                echo 'Building Order Service Image...'
-                sh 'docker build -t order-service:latest ./order-service'
-
-                echo 'Building Tracking Service Image...'
-                sh 'docker build -t tracking-service:latest ./tracking-service'
-
-                echo 'Building Gudang Service Image...'
-                sh 'docker build -t gudang-service:latest ./gudang-service'
-
-                echo 'Building Courier Service Image...'
-                sh 'docker build -t courier-service:latest ./courier-service'
-
-                echo 'Building Report Service Image...'
-                sh 'docker build -t report-service:latest ./report-service'
-
-                // tagging
-                sh "docker tag user-service:latest ${DOCKER_REGISTRY}/user-service:${IMAGE_TAG}"
-                sh "docker tag order-service:latest ${DOCKER_REGISTRY}/order-service:${IMAGE_TAG}"
-                sh "docker tag tracking-service:latest ${DOCKER_REGISTRY}/tracking-service:${IMAGE_TAG}"
-                sh "docker tag gudang-service:latest ${DOCKER_REGISTRY}/gudang-service:${IMAGE_TAG}"
-                sh "docker tag courier-service:latest ${DOCKER_REGISTRY}/courier-service:${IMAGE_TAG}"
-                sh "docker tag report-service:latest ${DOCKER_REGISTRY}/report-service:${IMAGE_TAG}"
-
-              // tagging latest
-              sh "docker tag user-service:latest ${DOCKER_REGISTRY}/user-service:latest"
-              sh "docker tag order-service:latest ${DOCKER_REGISTRY}/order-service:latest"
-              sh "docker tag tracking-service:latest ${DOCKER_REGISTRY}/tracking-service:latest"
-              sh "docker tag gudang-service:latest ${DOCKER_REGISTRY}/gudang-service:latest"
-              sh "docker tag courier-service:latest ${DOCKER_REGISTRY}/courier-service:latest"
-              sh "docker tag report-service:latest ${DOCKER_REGISTRY}/report-service:latest"
+                dir('TUBES/logistik-microservice-final') {
+                    sh 'docker compose up -d'
+                }
             }
         }
 
-        stage('5. Functional Tests') {
+        stage('Verify') {
             steps {
-        
-                sh 'docker-compose up -d --build'
-        
-                sleep time: 40, unit: 'SECONDS'
-        
-                echo 'Running User Functional Tests...'
-                dir('user-service') {
-                    sh '''
-                    DB_HOST=host.docker.internal \
-                    DB_PORT=3306 \
-                    DB_USER=root \
-                    DB_PASSWORD=root \
-                    DB_NAME=tubesdb \
-                    go test -tags=functional -v -run Functional ./...
-                    '''
-                }
-        
-                echo 'Running Order Functional Tests...'
-                dir('order-service') {
-                    sh '''
-                    DB_HOST=host.docker.internal \
-                    DB_PORT=3306 \
-                    DB_USER=root \
-                    DB_PASSWORD=root \
-                    DB_NAME=tubesdb \
-                    go test -tags=functional -v -run Functional ./...
-                    '''
-                }
-        
-                echo 'Running Tracking Functional Tests...'
-                dir('tracking-service') {
-                    sh '''
-                    DB_HOST=host.docker.internal \
-                    DB_PORT=3306 \
-                    DB_USER=root \
-                    DB_PASSWORD=root \
-                    DB_NAME=tubesdb \
-                    go test -tags=functional -v -run Functional ./...
-                    '''
-                }
-        
-                echo 'Running Gudang Functional Tests...'
-                dir('gudang-service') {
-                    sh '''
-                    DB_HOST=host.docker.internal \
-                    DB_PORT=3306 \
-                    DB_USER=root \
-                    DB_PASSWORD=root \
-                    DB_NAME=tubesdb \
-                    go test -tags=functional -v -run Functional ./...
-                    '''
-                }
-        
-                echo 'Running Courier Functional Tests...'
-                dir('courier-service') {
-                    sh '''
-                    DB_HOST=host.docker.internal \
-                    DB_PORT=3306 \
-                    DB_USER=root \
-                    DB_PASSWORD=root \
-                    DB_NAME=tubesdb \
-                    go test -tags=functional -v -run Functional ./...
-                    '''
-                }
-        
-                echo 'Running Report Functional Tests...'
-                dir('report-service') {
-                    sh '''
-                    DB_HOST=host.docker.internal \
-                    DB_PORT=3306 \
-                    DB_USER=root \
-                    DB_PASSWORD=root \
-                    DB_NAME=tubesdb \
-                    go test -tags=functional -v -run Functional ./...
-                    '''
-                }
+                sh 'curl http://localhost:8085/packages'
+                sh 'curl http://localhost:8086/deliveries'
             }
-        
-            post {
-                always {
-                    sh 'docker-compose down'
-                }
-            }
-        }
-
-        stage('6. Push Images') {
-            steps {
-                sh "docker push ${DOCKER_REGISTRY}/user-service:${IMAGE_TAG}"
-                sh "docker push ${DOCKER_REGISTRY}/order-service:${IMAGE_TAG}"
-                sh "docker push ${DOCKER_REGISTRY}/tracking-service:${IMAGE_TAG}"
-                sh "docker push ${DOCKER_REGISTRY}/gudang-service:${IMAGE_TAG}"
-                sh "docker push ${DOCKER_REGISTRY}/courier-service:${IMAGE_TAG}"
-                sh "docker push ${DOCKER_REGISTRY}/report-service:${IMAGE_TAG}"
-
-                sh "docker push ${DOCKER_REGISTRY}/user-service:latest"
-                sh "docker push ${DOCKER_REGISTRY}/order-service:latest"
-                sh "docker push ${DOCKER_REGISTRY}/tracking-service:latest"
-                sh "docker push ${DOCKER_REGISTRY}/gudang-service:latest"
-                sh "docker push ${DOCKER_REGISTRY}/courier-service:latest"
-                sh "docker push ${DOCKER_REGISTRY}/report-service:latest"
-            }
-        }
-
-        stage('7. Deploy Kubernetes') {
-            steps {
-                sh 'kubectl apply -f k8s/user-deployment.yaml'
-                sh 'kubectl apply -f k8s/order-deployment.yaml'
-                sh 'kubectl apply -f k8s/tracking-deployment.yaml'
-                sh 'kubectl apply -f k8s/gudang-deployment.yaml'
-                sh 'kubectl apply -f k8s/courier-deployment.yaml'
-                sh 'kubectl apply -f k8s/report-deployment.yaml'
-
-                sh 'kubectl apply -f k8s/user-service.yaml'
-                sh 'kubectl apply -f k8s/order-service.yaml'
-                sh 'kubectl apply -f k8s/tracking-service.yaml'
-                sh 'kubectl apply -f k8s/gudang-service.yaml'
-                sh 'kubectl apply -f k8s/courier-service.yaml'
-                sh 'kubectl apply -f k8s/report-service.yaml'
-            }
-        }
-
-        stage('8. Verify') {
-            steps {
-        
-                sh 'kubectl rollout restart deployment/user-service'
-                sh 'kubectl rollout restart deployment/order-service'
-                sh 'kubectl rollout restart deployment/tracking-service'
-                sh 'kubectl rollout restart deployment/gudang-service'
-                sh 'kubectl rollout restart deployment/courier-service'
-                sh 'kubectl rollout restart deployment/report-service'
-        
-                sleep time: 20, unit: 'SECONDS'
-        
-                sh 'kubectl get pods'
-                sh 'kubectl get svc'
-        
-                sh 'kubectl rollout status deployment/user-service --timeout=300s'
-                sh 'kubectl rollout status deployment/order-service --timeout=300s'
-                sh 'kubectl rollout status deployment/tracking-service --timeout=300s'
-                sh 'kubectl rollout status deployment/gudang-service --timeout=300s'
-                sh 'kubectl rollout status deployment/courier-service --timeout=300s'
-                sh 'kubectl rollout status deployment/report-service --timeout=300s'
-            }
-        }
-    }
-
-    post {
-        success {
-            echo 'Pipeline successfully executed!'
-        }
-        failure {
-            echo 'Pipeline failed. Check the logs above.'
-        }
-        unstable {
-            echo 'Pipeline is unstable (Functional test failed as expected).'
         }
     }
 }
