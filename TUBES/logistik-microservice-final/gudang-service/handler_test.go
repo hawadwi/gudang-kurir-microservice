@@ -7,9 +7,29 @@ import (
 	"testing"
 )
 
+
+// =======================
+// MOCK REPOSITORY
+// =======================
+type MockRepo struct{}
+
+func (m *MockRepo) Create(pkg *Package) error {
+	return nil
+}
+
+func (m *MockRepo) SaveOutbox(event string, data string) error {
+	return nil
+}
+
+
+// =======================
+// TEST START SORT SUCCESS
+// =======================
 func TestStartSort_AllValid(t *testing.T) {
+
+	repo := &MockRepo{}
 	service := NewSortingService(repo)
-	handler := NewSortingHandler(service)
+	handler := NewSortingHandler(service, repo)
 
 	body := `{"resi":"123","warehouse_zone":"A1","status":"sorting"}`
 	req := httptest.NewRequest("POST", "/sort", strings.NewReader(body))
@@ -22,9 +42,15 @@ func TestStartSort_AllValid(t *testing.T) {
 	}
 }
 
+
+// =======================
+// TEST ERROR CASES
+// =======================
 func TestStartSort_AllErrorPaths(t *testing.T) {
-	service := NewSortingService()
-	handler := NewSortingHandler(service)
+
+	repo := &MockRepo{}
+	service := NewSortingService(repo)
+	handler := NewSortingHandler(service, repo)
 
 	tests := []string{
 		`invalid-json`,
@@ -46,9 +72,15 @@ func TestStartSort_AllErrorPaths(t *testing.T) {
 	}
 }
 
+
+// =======================
+// TEST HEALTH
+// =======================
 func TestHealth_OK(t *testing.T) {
-	service := NewSortingService()
-	handler := NewSortingHandler(service)
+
+	repo := &MockRepo{}
+	service := NewSortingService(repo)
+	handler := NewSortingHandler(service, repo)
 
 	req := httptest.NewRequest("GET", "/health", nil)
 	w := httptest.NewRecorder()
