@@ -5,7 +5,7 @@ import (
 )
 
 func TestStartSortingSuccess(t *testing.T) {
-	service := NewSortingService()
+	service := NewSortingService(repo)
 
 	pkg := &Package{
 		UserID:        123,
@@ -27,7 +27,7 @@ func TestStartSortingSuccess(t *testing.T) {
 }
 
 func TestStartSortingNil(t *testing.T) {
-	service := NewSortingService()
+	service := NewSortingService(repo)
 
 	err := service.StartSorting(nil)
 	if err == nil {
@@ -36,7 +36,7 @@ func TestStartSortingNil(t *testing.T) {
 }
 
 func TestStartSortingEmptyResi(t *testing.T) {
-	service := NewSortingService()
+	service := NewSortingService(repo)
 
 	pkg := &Package{
 		UserID:        123,
@@ -52,7 +52,7 @@ func TestStartSortingEmptyResi(t *testing.T) {
 }
 
 func TestStartSortingEmptyWarehouseZone(t *testing.T) {
-	service := NewSortingService()
+	service := NewSortingService(repo)
 
 	pkg := &Package{
 		UserID:        123,
@@ -68,7 +68,7 @@ func TestStartSortingEmptyWarehouseZone(t *testing.T) {
 }
 
 func TestStartSortingInvalidStatus(t *testing.T) {
-	service := NewSortingService()
+	service := NewSortingService(repo)
 
 	pkg := &Package{
 		UserID:        123,
@@ -84,7 +84,7 @@ func TestStartSortingInvalidStatus(t *testing.T) {
 }
 
 func TestCompleteSortingSuccess(t *testing.T) {
-	service := NewSortingService()
+	service := NewSortingService(repo)
 
 	pkg := &Package{
 		Resi:          "RES001",
@@ -107,7 +107,7 @@ func TestCompleteSortingSuccess(t *testing.T) {
 }
 
 func TestCompleteSortingNil(t *testing.T) {
-	service := NewSortingService()
+	service := NewSortingService(repo)
 
 	err := service.CompleteSorting(nil)
 	if err == nil {
@@ -116,7 +116,7 @@ func TestCompleteSortingNil(t *testing.T) {
 }
 
 func TestCompleteSortingNotSorting(t *testing.T) {
-	service := NewSortingService()
+	service := NewSortingService(repo)
 
 	pkg := &Package{
 		Resi:          "RES001",
@@ -131,7 +131,7 @@ func TestCompleteSortingNotSorting(t *testing.T) {
 }
 
 func TestGetPendingPackagesSuccess(t *testing.T) {
-	service := NewSortingService()
+	service := NewSortingService(repo)
 
 	packages := []Package{
 		{Resi: "RES001", Status: "pending"},
@@ -146,7 +146,7 @@ func TestGetPendingPackagesSuccess(t *testing.T) {
 }
 
 func TestGetPendingPackagesEmpty(t *testing.T) {
-	service := NewSortingService()
+	service := NewSortingService(repo)
 
 	packages := []Package{
 		{Resi: "RES001", Status: "sorting"},
@@ -160,7 +160,7 @@ func TestGetPendingPackagesEmpty(t *testing.T) {
 }
 
 func TestValidatePackageSuccess(t *testing.T) {
-	service := NewSortingService()
+	service := NewSortingService(repo)
 
 	pkg := &Package{
 		Resi:          "RES001",
@@ -185,7 +185,7 @@ func TestValidatePackageNil(t *testing.T) {
 }
 
 func TestValidatePackageEmptyResi(t *testing.T) {
-	service := NewSortingService()
+	service := NewSortingService(repo)
 
 	pkg := &Package{
 		Resi:          "",
@@ -201,7 +201,7 @@ func TestValidatePackageEmptyResi(t *testing.T) {
 }
 
 func TestValidatePackageInvalidUserID(t *testing.T) {
-	service := NewSortingService()
+	service := NewSortingService(repo)
 
 	pkg := &Package{
 		Resi:          "RES001",
@@ -217,7 +217,7 @@ func TestValidatePackageInvalidUserID(t *testing.T) {
 }
 
 func TestValidatePackageInvalidWeight(t *testing.T) {
-	service := NewSortingService()
+	service := NewSortingService(repo)
 
 	pkg := &Package{
 		Resi:          "RES001",
@@ -233,7 +233,7 @@ func TestValidatePackageInvalidWeight(t *testing.T) {
 }
 
 func TestValidatePackageEmptyWarehouseZone(t *testing.T) {
-	service := NewSortingService()
+	service := NewSortingService(repo)
 
 	pkg := &Package{
 		Resi:          "RES001",
@@ -249,7 +249,7 @@ func TestValidatePackageEmptyWarehouseZone(t *testing.T) {
 }
 
 func BenchmarkStartSorting(b *testing.B) {
-	service := NewSortingService()
+	service := NewSortingService(repo)
 	pkg := &Package{
 		UserID:        123,
 		Resi:          "RES001",
@@ -264,7 +264,7 @@ func BenchmarkStartSorting(b *testing.B) {
 }
 
 func BenchmarkValidatePackage(b *testing.B) {
-	service := NewSortingService()
+	service := NewSortingService(repo)
 	pkg := &Package{
 		Resi:          "RES001",
 		UserID:        123,
