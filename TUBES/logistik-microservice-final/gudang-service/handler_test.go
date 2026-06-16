@@ -8,8 +8,8 @@ import (
 )
 
 func TestStartSort_AllValid(t *testing.T) {
-	service := NewSortingService()
-	handler := NewSortingHandler(service)
+	service := NewSortingService(repo)
+	handler := NewSortingHandler(service, repo)
 
 	body := `{"resi":"123","warehouse_zone":"A1","status":"sorting"}`
 	req := httptest.NewRequest("POST", "/sort", strings.NewReader(body))
@@ -23,8 +23,8 @@ func TestStartSort_AllValid(t *testing.T) {
 }
 
 func TestStartSort_AllErrorPaths(t *testing.T) {
-	service := NewSortingService()
-	handler := NewSortingHandler(service)
+	service := NewSortingService(repo)
+	handler := NewSortingHandler(service, repo)
 
 	tests := []string{
 		`invalid-json`,
@@ -47,8 +47,8 @@ func TestStartSort_AllErrorPaths(t *testing.T) {
 }
 
 func TestHealth_OK(t *testing.T) {
-	service := NewSortingService()
-	handler := NewSortingHandler(service)
+	service := NewSortingService(repo)
+	handler := NewSortingHandler(service, repo)
 
 	req := httptest.NewRequest("GET", "/health", nil)
 	w := httptest.NewRecorder()
