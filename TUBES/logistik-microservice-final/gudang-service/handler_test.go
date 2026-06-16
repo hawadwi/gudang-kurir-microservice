@@ -8,6 +8,7 @@ import (
 )
 
 func TestStartSort_AllValid(t *testing.T) {
+	repo := &PackageRepository{db: nil}
 	service := NewSortingService(repo)
 	handler := NewSortingHandler(service, repo)
 
@@ -23,6 +24,7 @@ func TestStartSort_AllValid(t *testing.T) {
 }
 
 func TestStartSort_AllErrorPaths(t *testing.T) {
+	repo := &PackageRepository{db: nil}
 	service := NewSortingService(repo)
 	handler := NewSortingHandler(service, repo)
 
@@ -47,6 +49,7 @@ func TestStartSort_AllErrorPaths(t *testing.T) {
 }
 
 func TestHealth_OK(t *testing.T) {
+	repo := &PackageRepository{db: nil}
 	service := NewSortingService(repo)
 	handler := NewSortingHandler(service, repo)
 
