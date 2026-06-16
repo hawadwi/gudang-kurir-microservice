@@ -6,7 +6,7 @@ pipeline {
         stage('Test Gudang') {
             steps {
                 dir('TUBES/logistik-microservice-final/gudang-service') {
-                    sh 'go test ./...'
+                    bat 'go test ./...'
                 }
             }
         }
@@ -14,7 +14,7 @@ pipeline {
         stage('Test Courier') {
             steps {
                 dir('TUBES/logistik-microservice-final/courier-service') {
-                    sh 'go test ./...'
+                    bat 'go test ./...'
                 }
             }
         }
@@ -22,7 +22,7 @@ pipeline {
         stage('Build Images') {
             steps {
                 dir('TUBES/logistik-microservice-final') {
-                    sh 'docker compose build'
+                    bat 'docker compose build'
                 }
             }
         }
@@ -30,15 +30,15 @@ pipeline {
         stage('Run Containers') {
             steps {
                 dir('TUBES/logistik-microservice-final') {
-                    sh 'docker compose up -d'
+                    bat 'docker compose up -d'
                 }
             }
         }
 
         stage('Verify') {
             steps {
-                sh 'curl http://localhost:8085/packages'
-                sh 'curl http://localhost:8086/deliveries'
+                bat 'curl http://localhost:8085/packages'
+                bat 'curl http://localhost:8086/deliveries'
             }
         }
     }
