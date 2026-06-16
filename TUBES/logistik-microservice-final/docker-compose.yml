@@ -1,0 +1,71 @@
+services:
+
+  gudang-service:
+    build: ./gudang-service
+    ports:
+      - "8085:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: gudang_microservice
+      DB_DSN: root:root@tcp(mysql:3306)/gudang_microservice?parseTime=true
+
+  courier-service:
+    build: ./courier-service
+    ports:
+      - "8086:8081"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: courier_microservice
+      DB_DSN: root:root@tcp(mysql:3306)/courier_microservice?parseTime=true
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+
+  mysql:
+    image: mysql:8
+    container_name: mysql-tubes
+    restart: always
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: gudang_microservice
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 10s
+      retries: 30
+    volumes:
+      - ./init/gudang_microservice.sql:/docker-entrypoint-initdb.d/gudang_microservice.sql
+      - ./init/courier_microservice.sql:/docker-entrypoint-initdb.d/courier_microservice.sql
+
+networks:
+  default:
+    name: logistics-network
+
+volumes:
+  mysql_data:
